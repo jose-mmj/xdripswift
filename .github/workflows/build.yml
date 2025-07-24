@@ -21,11 +21,11 @@ jobs:
         with:
           xcode-version: '15.0'
 
-      # 3. Configurar el entorno de Ruby para Fastlane
+      # 3. Configurar el entorno de Ruby para Fastlane (VERSIÓN CORREGIDA)
       - name: Setup Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.2' # <--- CAMBIO AQUÍ. Actualizado de 3.0 a 3.2
           bundler-cache: true # Instala automáticamente las gemas del Gemfile (incluyendo fastlane)
 
       # 4. Crear un Fastfile nuevo y correcto sobre la marcha
