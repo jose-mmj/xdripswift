@@ -19,9 +19,16 @@ jobs:
         with:
           xcode-version: '15.0'
 
-      - name: Archive using default locations
+      # PASO 1: Forzar la resolución de dependencias por separado.
+      - name: Resolve Package Dependencies
         run: |
-          # Eliminamos -archivePath para dejar que Xcode use su ruta por defecto y evitar el error
+          xcodebuild -resolvePackageDependencies \
+            -project xDrip.xcodeproj \
+            -scheme xDrip
+
+      # PASO 2: Archivar la aplicación una vez las dependencias están listas.
+      - name: Archive the application
+        run: |
           xcodebuild archive \
             -project xDrip.xcodeproj \
             -scheme xDrip \
@@ -32,12 +39,8 @@ jobs:
 
       - name: Find and Export the .ipa
         run: |
-          # Buscamos el archivo .xcarchive más reciente que se haya creado en la ubicación por defecto
           LATEST_ARCHIVE_PATH=$(find ~/Library/Developer/Xcode/Archives -name "xDrip.xcarchive" | sort | tail -n 1)
-          
           echo "Archive found at: $LATEST_ARCHIVE_PATH"
-
-          # Exportamos el archivo encontrado
           xcodebuild -exportArchive \
             -archivePath "$LATEST_ARCHIVE_PATH" \
             -exportPath $PWD/build \
