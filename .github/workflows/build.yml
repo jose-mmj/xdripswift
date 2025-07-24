@@ -19,19 +19,26 @@ jobs:
         with:
           xcode-version: '15.0'
 
-      - name: Build the application (no signing)
+      - name: Archive the application
         run: |
-          # Usamos .xcodeproj porque el proyecto usa Swift Package Manager
-          xcodebuild -project xDrip.xcodeproj -scheme xDrip -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          xcodebuild archive \
+            -project xDrip.xcodeproj \
+            -scheme xDrip \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $PWD/build/xDrip.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
 
-      - name: Create IPA file
+      - name: Export the .ipa
         run: |
-          mkdir -p Payload
-          cp -R build/Build/Products/Release-iphoneos/xDrip.app Payload/
-          zip -r xDrip.ipa Payload
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/xDrip.xcarchive \
+            -exportPath $PWD/build \
+            -exportOptionsPlist ExportOptions.plist
 
       - name: Upload Artifact (Compiled App)
         uses: actions/upload-artifact@v4
         with:
           name: xDrip-App
-          path: xDrip.ipa
+          path: build/xDrip.ipa
