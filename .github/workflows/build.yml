@@ -1,0 +1,36 @@
+name: Build xDripSwift
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.0'
+
+      - name: Build the application
+        run: |
+          xcodebuild -project xDrip.xcodeproj -scheme xDrip -configuration Release -derivedDataPath build/
+
+      - name: Create IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/xDrip.app Payload/
+          zip -r xDrip.ipa Payload
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xDrip-App
+          path: xDrip.ipa
