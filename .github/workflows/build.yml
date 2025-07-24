@@ -3,7 +3,7 @@ name: Build xDripSwift
 on:
   push:
     branches:
-      - master
+      - master # O la rama principal que uses, ej: main
 
 jobs:
   build:
@@ -19,17 +19,20 @@ jobs:
         with:
           xcode-version: '15.0'
 
-      - name: Build the application
-        run: |
-          xcodebuild -project xDrip.xcodeproj -scheme xDrip -configuration Release -derivedDataPath build/
+      - name: Install Dependencies (CocoaPods)
+        run: pod install --repo-update
 
-      - name: Create IPA
+      - name: Build the application (no signing)
+        run: |
+          xcodebuild -workspace xDrip.xcworkspace -scheme xDrip -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+      - name: Create IPA file
         run: |
           mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/xDrip.app Payload/
           zip -r xDrip.ipa Payload
 
-      - name: Upload Artifact
+      - name: Upload Artifact (Compiled App)
         uses: actions/upload-artifact@v4
         with:
           name: xDrip-App
