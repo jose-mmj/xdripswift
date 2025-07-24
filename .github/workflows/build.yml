@@ -19,12 +19,10 @@ jobs:
         with:
           xcode-version: '15.0'
 
-      - name: Install Dependencies (CocoaPods)
-        run: pod install --repo-update
-
       - name: Build the application (no signing)
         run: |
-          xcodebuild -workspace xDrip.xcworkspace -scheme xDrip -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+          # Usamos .xcodeproj porque el proyecto usa Swift Package Manager
+          xcodebuild -project xDrip.xcodeproj -scheme xDrip -sdk iphoneos -configuration Release -derivedDataPath build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
       - name: Create IPA file
         run: |
